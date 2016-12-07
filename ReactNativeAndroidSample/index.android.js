@@ -18,19 +18,46 @@ import {
 export default class ReactNativeAndroidSample extends Component {
   constructor(){
     super();
+    this.state={
+      username:"",
+      password:""
+    }
     this.submit=this.submit.bind(this);
   }
   submit(){
-    var username=this.refs['username'].value||"";
-    var password=this.refs['password'].value||"";
-    var x=JSON.stringify(this.refs['username']);
-    alert(x);
+    var username=this.state.username;
+    var password=this.state.password;
+    if(username==""||password==""){
+      alert("Empty Username or password");
+      Vibration.vibrate();
+    }
+    else{
+      fetch('http://192.168.86.88:4131/v1/user', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+                  username: username,
+                  password: password,
+                })
+      }).then(function(response) {
+        if(response.ok){
+          alert("Yay you are user of this app");
+        }
+        else{
+          alert("You are not");
+        }
+      })
+
+    }
   }
   render() {
     return (
       <View style={styles.container}>
-        <TextInput ref="username" style={{width:300}} placeholder="Username" />
-        <TextInput ref="password" style={{width:300}} secureTextEntry={true} placeholder="Password"/>
+        <TextInput style={{width:300}} value={this.state.username} onChangeText={(text)=>{this.setState({username:text})}} placeholder="Username" />
+        <TextInput style={{width:300}} value={this.state.password} onChangeText={(text)=>{this.setState({password:text})}} secureTextEntry={true} placeholder="Password"/>
         <Button title="Submit" onPress={this.submit}/>
       </View>
     );
